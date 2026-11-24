@@ -1,6 +1,6 @@
 // mini-react.js
+export const Fragment = Symbol("Fragment");
 
-// Hàm phụ trợ tạo text node, giúp đóng gói chuỗi văn bản thành một VNode an toàn
 export function createTextElement(text) {
   return {
     type: "TEXT_ELEMENT",
@@ -11,35 +11,90 @@ export function createTextElement(text) {
   };
 }
 
-// Hàm chính tạo VNode (giống React.createElement)
 export function createElement(type, props, ...children) {
   return {
     type,
     props: {
       ...props,
-      // Map qua danh sách children. Nếu child là chuỗi hoặc số, bọc nó bằng createTextElement
-      children: children.map((child) =>
-        typeof child === "object" ? child : createTextElement(child),
-      ),
+      children: children
+        .flat()
+        .map((child) =>
+          typeof child === "object" ? child : createTextElement(child),
+        ),
     },
   };
 }
 
+// 1. Dynamic import via lazy() (Exercise 1.1)
+export function lazy(loader) {
+  let status = "pending";
+  let result;
+  let promise = null;
+
+  return function LazyComponent(props) {
+    if (status === "pending") {
+      if (!promise) {
+        promise = loader().then(
+          (mod) => {
+            status = "resolved";
+            result = mod.default || Object.values(mod)[0];
+          },
+          (err) => {
+            status = "rejected";
+            result = err;
+          },
+        );
+      }
+      throw promise; // Ném promise cho Suspense bắt
+    }
+    if (status === "rejected") throw result;
+    return result(props);
+  };
+}
+
+// 2. Suspense Boundary (Exercise 1.1)
+export function Suspense({ fallback, children }) {
+  try {
+    return typeof children === "function" ? children() : children;
+  } catch (thrown) {
+    if (thrown && typeof thrown.then === "function") {
+      // Khi promise tải xong thì trigger render lại toàn app
+      thrown.then(() => {
+        window.dispatchEvent(new CustomEvent("mini-react-rerender"));
+      });
+      return fallback;
+    }
+    throw thrown;
+  }
+}
+
 export function renderToDOM(vnode) {
-  // Safe Guard: Nếu vnode là null/undefined/boolean thì bỏ qua không render
   if (vnode === null || vnode === undefined || typeof vnode === "boolean") {
     return document.createTextNode("");
   }
 
-  // 1. TEXT_ELEMENT
+  // Hỗ trợ Component function trực tiếp
+  if (typeof vnode.type === "function") {
+    return renderToDOM(vnode.type(vnode.props));
+  }
+
+  // Hỗ trợ Fragment (Exercise 1.7.1)
+  if (vnode.type === Fragment) {
+    const frag = document.createDocumentFragment();
+    vnode.props.children.forEach((child) => {
+      if (child !== null && child !== undefined) {
+        frag.appendChild(renderToDOM(child));
+      }
+    });
+    return frag;
+  }
+
   if (vnode.type === "TEXT_ELEMENT") {
     return document.createTextNode(vnode.props.nodeValue);
   }
 
-  // 2. Tạo thẻ HTML
   const dom = document.createElement(vnode.type);
 
-  // 3. Gán props và sự kiện
   const isProperty = (key) => key !== "children";
   Object.keys(vnode.props)
     .filter(isProperty)
@@ -54,7 +109,6 @@ export function renderToDOM(vnode) {
       }
     });
 
-  // 4. Render children an toàn
   vnode.props.children.forEach((child) => {
     if (child !== null && child !== undefined) {
       dom.appendChild(renderToDOM(child));

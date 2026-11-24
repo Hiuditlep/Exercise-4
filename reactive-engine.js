@@ -75,3 +75,9 @@ export function TaskApp() {
     ),
   );
 }
+// Thêm vào cuối file reactive-engine.js:
+window.addEventListener("mini-react-rerender", () => {
+  if (rootComponent && rootElement) {
+    renderApp(rootComponent, rootElement);
+  }
+});
