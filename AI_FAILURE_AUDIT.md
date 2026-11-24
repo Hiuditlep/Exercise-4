@@ -1,30 +1,31 @@
-# AI FAILURE MODE AUDIT REPORT
+# AI FAILURE MODE AUDIT REPORT — LAB 04
 
-## Phát hiện ảo giác kiến trúc, lỗ hổng bảo mật và suy giảm hiệu năng trong quá trình sinh mã tự động
-
-> **Báo cáo kiểm toán kỹ thuật (Mandatory 15% Evaluation Deliverable)**: Phân tích 3 lỗi nghiêm trọng kinh điển do AI tạo ra trong phát triển giao diện hiện đại, đối chiếu bằng chứng nhận diện trên Chrome DevTools và đề xuất giải pháp tái cấu trúc (Engineering Refactor).
+## Phân tích phản mẫu (Anti-Patterns), lỗ hổng bất đồng bộ và bảo mật API trong kiến trúc SPA
 
 ---
 
-## 1. Vulnerability 01: Lạm dụng innerHTML & Hội chứng Div-Soup (XSS & AOM Collapse)
+## 1. Vulnerability 01: Chuỗi useEffect đồng bộ dây chuyền (Cascading Re-renders & Infinite Loop)
 
-### 1.1. Ngữ cảnh & Mã nguồn lỗi do AI đề xuất
+### 1.1. Ngữ cảnh & Mã nguồn lỗi do AI đề xuất (Exercise 1.3)
 
-- **Prompt gửi AI**: _"Tạo component hiển thị thông tin thẻ kỹ sư kèm tiểu sử và danh sách kỹ năng từ props."_
-- **Đoạn mã do AI sinh ra**:
+- **Prompt gửi AI**: _"Tạo form đăng ký có kiểm tra lỗi từng ô input và cập nhật trạng thái hợp lệ của toàn bộ form."_
+- **Đoạn mã phản mẫu do AI sinh ra**:
+
   ```javascript
-  export function LegacyDeveloperCard({ user }) {
-    return `
-      <div class="card">
-        <div class="header">
-          <img src="${user.avatarUrl}" />
-          <div class="user-info">
-            <div class="name">${user.fullName}</div>
-            <div class="role">${user.bio}</div>
-          </div>
-        </div>
-      </div>
-    `;
-    // Thường được chèn vào DOM thật bằng: container.innerHTML = LegacyDeveloperCard(data);
+  function LegacyForm() {
+    const [name, setName] = useState("");
+    const [nameError, setNameError] = useState("");
+    const [isValid, setIsValid] = useState(false);
+
+    // Anti-pattern: Dùng useEffect đồng bộ state con -> state cha
+    useEffect(() => {
+      setNameError(name.length < 3 ? "Tên quá ngắn" : "");
+    }, [name]);
+
+    useEffect(() => {
+      setIsValid(nameError === "");
+    }, [nameError]);
+
+    return (/* ... */);
   }
   ```

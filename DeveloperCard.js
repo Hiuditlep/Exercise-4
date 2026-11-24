@@ -2,11 +2,9 @@
 import { createElement } from "./mini-react.js";
 
 export function DeveloperCard(props = {}) {
-  const fullName = props.fullName || "Tran Vinh Khiem";
-  const role = props.role || "Senior Systems Architect • UIT S3T";
-  const avatarUrl =
-    props.avatarUrl ||
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=240";
+  const fullName = props.fullName || "Nguyễn Minh Hiếu";
+  const role = props.role || "Senior Systems Architect • UIT • 2024";
+  const avatarUrl = props.avatarUrl || "Hiu_Đit_Lep.jpg";
   const metrics = props.metrics || {
     commits: 512,
     vdomNodes: 0,

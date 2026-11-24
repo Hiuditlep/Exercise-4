@@ -1,83 +1,83 @@
 # TASK DECOMPOSITION & WORK BREAKDOWN STRUCTURE (WBS)
-## Môn học: Phát triển Ứng dụng Web — Lab 03: Modern React Architecture & State Integrity
+
+## Môn học: Phát triển Ứng dụng Web — Lab 04: Multi-Route SPA Architecture & Express Backend Hygiene
 
 ---
 
-## I. TỔNG QUAN KIẾN TRÚC & PHƯƠNG PHÁP TRIỂN KHAI
-- **Nền tảng thực thi**: Kế thừa trực tiếp hệ thống Mini-React VDOM Engine (`mini-react.js`) và Reactive Engine (`reactive-engine.js`) đã xây dựng từ Lab 2.
-- **Ràng buộc mã nguồn (Code Contracts)**:
-  1. *Strict Zero Div-Soup*: 100% thẻ ngữ nghĩa thuần (`<article>`, `<header>`, `<hgroup>`, `<dl>`, `<ul>`, `<section>`), loại bỏ hoàn toàn thẻ `<div>` trong component hiển thị.
-  2. *Single Source of Truth & Derived State*: Không sử dụng `useEffect` cho các tác vụ lọc/tìm kiếm/sắp xếp; tính toán trực tiếp on-the-fly trong luồng render.
-  3. *Fault-Tolerant Finite State Machine*: Quản lý 4 trạng thái rời rạc (`IDLE`, `LOADING`, `SUCCESS`, `ERROR`), điều khiển hủy luồng bất đồng bộ qua `AbortController` và triệt tiêu Cumulative Layout Shift (0.00 CLS) bằng Skeleton Box cố định 220px.
-  4. *Atomic Git Commits*: Mỗi tính năng/bước kỹ thuật tương ứng với 1 commit độc lập, thông điệp tuân thủ chặt chẽ Conventional Commits để phục vụ đối soát WBS Audit.
+## I. TỔNG QUAN KIẾN TRÚC KẾ THỪA & MỞ RỘNG
+
+- **Nền tảng kế thừa**: Kế thừa trọn vẹn Custom Virtual DOM Engine (`mini-react.js`), Reactive State Engine (`reactive-engine.js`), và các component từ Lab 2 & Lab 3 (`DeveloperCard.js`, `ScientistDirectory.js`, `PubgMatchTelemetry.js`).
+- **Nâng cấp kiến trúc trong Lab 4**:
+  1. _Code-Splitting & Suspense Boundaries_: Nâng cấp `mini-react.js` hỗ trợ `Fragment`, `lazy()` dynamic import và `<Suspense>` boundary kèm Skeleton Box chống giật bố cục (`CLS = 0`).
+  2. _Multi-Route SPA Architecture_: Xây dựng bộ định tuyến khai báo (`router.js`) hỗ trợ `<Routes>`, `<Route>`, nested `<Layout>` với `<Outlet>`, `<NavLink>` nhận callback `isActive`, và `useParams()`.
+  3. _Master-Detail & CSS Grid_: Tách trang chi tiết `PersonDetail.js` sử dụng CSS Grid `minmax(280px, 1fr) 2fr`, thẻ mô tả ngữ nghĩa `<dl>` và xử lý trang lỗi 404 (`NotFoundState`).
+  4. _Single-Pass Form Validation_: Triệt tiêu chuỗi `useEffect` đồng bộ lồng nhau trong `RegistrationForm.js` (1 keystroke = 1 render pass).
+  5. _Custom Hook & Express Hygiene_: Tách logic gọi API ra hook `useForumMessages.js` có `AbortController`, render `<dl>` với keyed `Fragment`, kết hợp backend `server.js` cấu hình CORS và kiểm tra tính hợp lệ payload đầu vào.
 
 ---
 
 ## II. MA TRẬN PHÂN RÃ CÔNG VIỆC (WORK BREAKDOWN STRUCTURE)
 
-### 1. Sprint 1: Semantic Engineer & Pro-Gamer Profile Card (Exercise 1)
-- **Mục tiêu**: Nâng cấp module Profile Card kế thừa từ Lab 2, thiết lập bộ khung ngữ nghĩa chuẩn AOM (Accessibility Object Model) và CSS Modules tương thích thiết bị di động 375px.
+### 1. Sprint 1: Core Engine Upgrades & Code-Splitting (Exercise 1.1)
+
+- **Mục tiêu**: Hỗ trợ tải động module theo tuyến đường (route-level chunking) và bảo toàn chỉ số ổn định hình ảnh (`CLS = 0`).
 - **Các gói công việc cụ thể**:
-  - [x] **Task 1.1**: Hiện thực component `DeveloperCard.js`.
-    - Thay thế các khối layout `<div>` bằng semantic landmarks: `<article aria-labelledby="dev-heading">`, `<header>`, `<hgroup>`, `<dl>` cho metadata và `<ul>` cho danh sách kỹ năng.
-    - Ép ràng buộc HTTPS-only media origins cho ảnh đại diện, chỉ định tường minh thuộc tính `width="64"` và `height="64"` để triệt tiêu hiện tượng giật giao diện (Zero CLS).
-    - Cấu hình ES6 default parameters an toàn cho props (`fullName`, `role`, `avatarUrl`, `metrics`, `skills`).
-    - **Atomic Commit 1**: `feat(ex1): implement semantic DeveloperCard and SkillBadge`
-  - [x] **Task 1.2**: Xây dựng kiến trúc giao diện `developer-card.css`.
-    - Định nghĩa CSS Custom Properties (`--card-bg`, `--accent`, `--border`, v.v.) quản lý theme.
-    - Thiết lập hệ thống lưới `grid` cho danh mục thẻ `<dl>` thông số.
-    - Định nghĩa media query `@media (max-width: 375px)` tối ưu hóa layout cho iPhone SE, triệt tiêu hoàn toàn lỗi tràn viền và thanh cuộn ngang (Zero horizontal scroll).
-    - **Atomic Commit 2**: `style(ex1): add responsive 375px CSS module`
+  - [x] **Task 1.1**: Mở rộng `mini-react.js` và `reactive-engine.js`.
+    - Bổ sung `Symbol("Fragment")` cho phép nhóm nhiều node con mà không sinh thẻ `<div>` dư thừa.
+    - Xây dựng hàm `lazy(loader)` kích hoạt dynamic `import()` và ném Promise cho `Suspense` bắt giữ.
+    - Thiết lập `<Suspense fallback={...}>` tự động re-render ứng dụng thông qua sự kiện `mini-react-rerender` khi chunk tải xong.
+    - **Atomic Commit**: `feat(core): add Fragment, lazy and Suspense boundaries to Mini-React`
+  - [x] **Task 1.2**: Thiết kế `PersonDetailSkeleton` khớp kích thước thực tế (`height: 210px`, `aria-busy="true"`, `aria-live="polite"`) đảm bảo `CLS = 0`.
 
 ---
 
-### 2. Sprint 2: Interactive Scientist & Pioneer Directory (Exercise 2)
-- **Mục tiêu**: Xây dựng bộ điều hướng dữ liệu khoa học tương tác cao dựa trên luồng dữ liệu một chiều (Unidirectional Data Flow), Derived State và cơ chế Reconciliation.
+### 2. Sprint 2: Declarative SPA Router & Master-Detail Views (Exercises 1.2, 1.2.1 & 1.2.2)
+
+- **Mục tiêu**: Chuyển đổi ứng dụng từ hiển thị dồn trang sang mô hình Single-Page Application đa tuyến đường có tham số động.
 - **Các gói công việc cụ thể**:
-  - [x] **Task 2.1**: Thiết lập cấu trúc dữ liệu thực thể chuẩn hóa.
-    - Định nghĩa mảng dữ liệu `SMART_PEOPLE` gán Stable ID duy nhất (`sp-1`, `sp-2`, ...) đảm bảo tính bất biến của key khi diffing VDOM.
-    - Khởi tạo trạng thái độc lập qua `useState` trong `reactive-engine.js`: `people`, `query`, `minIq`, `sortBy`.
-    - **Atomic Commit 3**: `feat(ex2): normalize smartPeople schema with stable IDs`
-  - [x] **Task 2.2**: Thiết lập đường ống tính toán dẫn xuất (Derived State Pipeline).
-    - Triệt tiêu hoàn toàn `useEffect` cho việc lọc danh sách; tính toán `visible` trực tiếp trong chu kỳ render để đảm bảo 1 keystroke chỉ tạo đúng 1 render pass duy nhất.
-    - Hiện thực logic tìm kiếm tên không phân biệt hoa thường (`toLowerCase().includes()`).
-    - Đảm bảo tính an toàn kiểu số cho bộ lọc IQ thông qua thuộc tính chuẩn `e.target.valueAsNumber`.
-    - Hiện thực cơ chế sắp xếp bất biến thông qua phương thức hiện đại ECMAScript 2023 `Array.prototype.toSorted()`.
-    - **Atomic Commit 4**: `feat(ex2): add search, IQ filter & toSorted`
-  - [x] **Task 2.3**: Xây dựng giao tiếp khả năng tiếp cận (Accessibility) và thao tác CRUD cơ bản.
-    - Liên kết chặt chẽ `<label htmlFor>` với từng trường `<input id>` để người dùng trình đọc màn hình dễ dàng điều hướng.
-    - Hiện thực hàm xóa bất biến `handleDelete` thông qua mảng lọc `.filter(p => p.id !== id)`.
-    - Cung cấp tính năng khôi phục toàn vẹn dữ liệu `handleReset`.
-    - Xuất số lượng kết quả tìm kiếm theo thời gian thực bằng thẻ `<output role="status" aria-live="polite">`.
-    - **Atomic Commit 5**: `feat(ex2): add delete/reset & live status`
+  - [x] **Task 2.1**: Xây dựng bộ định tuyến `router.js`.
+    - Hiện thực `<Routes>` và `<Route>` hỗ trợ nested routing qua thẻ `<Outlet />`.
+    - Hiện thực `<NavLink>` hỗ trợ functional callback `className={({ isActive }) => ...}` và thuộc tính `aria-current="page"`.
+    - Hiện thực hook `useParams()` phân giải tham số động trên URL (ví dụ: `/scientists/:id`).
+    - **Atomic Commit**: `feat(router): implement declarative Routes, NavLink, Outlet and useParams`
+  - [x] **Task 2.2**: Hiện thực trang chi tiết `PersonDetail.js` và liên kết từ `ScientistDirectory.js`.
+    - Tra cứu thực thể qua `SMART_PEOPLE.find((p) => p.id === id)` kế thừa từ Lab 3.
+    - Render giao diện 2 cột bằng CSS Grid `grid-template-columns: minmax(280px, 1fr) 2fr` và danh sách định nghĩa `<dl>`, `<dt>`, `<dd>`.
+    - Xây dựng giao diện dự phòng `<NotFoundState />` kèm cảnh báo `role="alert"` khi ID trên URL không tồn tại.
+    - **Atomic Commit**: `feat(ex1.2): implement Master-Detail PersonDetail with CSS Grid and 404 fallback`
 
 ---
 
-### 3. Sprint 3: KRAFTON PUBG Vietnam Series Live Telemetry (Exercise 3)
-- **Mục tiêu**: Xây dựng trạm radar dữ liệu Esports trực tiếp chống chịu lỗi (Fault-Tolerant), kiểm soát kết nối bất đồng bộ và chống rò rỉ bộ nhớ.
+### 3. Sprint 3: Single-Pass Form Validation (Exercise 1.3)
+
+- **Mục tiêu**: Giải quyết triệt để lỗi kiến trúc chaining `useEffect` gây vòng lặp re-render dây chuyền.
 - **Các gói công việc cụ thể**:
-  - [x] **Task 3.1**: Hiện thực FSM 4 trạng thái và quản lý luồng hủy `AbortController`.
-    - Quản lý trạng thái giao diện theo mô hình FSM rời rạc (`IDLE`, `LOADING`, `SUCCESS`, `ERROR`).
-    - Tích hợp `AbortController` để hủy bỏ tức thì request vệ tinh đang bay (in-flight request) khi người dùng chuyển đội tuyển (Switch squad) liên tục, ngăn ngừa triệt để Race Condition.
-    - Xây dựng lớp bảo vệ an toàn (Safe AbortError Guard) bỏ qua các ngoại lệ `AbortError`, tránh phát sinh thông báo lỗi giả mạo trên UI.
-    - **Atomic Commit 6**: `feat(ex3): implement PUBG VN 4-state telemetry & AbortController`
-  - [x] **Task 3.2**: Hiện thực Skeleton Loader, Accessible Error Alert và cơ chế Retry.
-    - Thiết kế khung Skeleton màu xanh Blue-Zone có animation nhấp nháy (`pulseBlueZone`) với chiều cao cố định đúng `220px` nhằm bảo đảm chỉ số CLS tuyệt đối bằng 0.00.
-    - Xóa bỏ triệt để hành vi chặn luồng của `window.alert()`; thay thế bằng hộp cảnh báo ngữ nghĩa `<section role="alert">`.
-    - Thiết lập nút phục hồi kết nối "Reconnect Satellite (Retry)" kích hoạt lại tiến trình lấy dữ liệu.
-    - **Atomic Commit 7**: `feat(ex3): add skeleton UI & retry alert`
+  - [x] **Task 3.1**: Xây dựng `RegistrationForm.js` theo mô hình Derived Validation State.
+    - Tính toán trực tiếp đối tượng `errors` và cờ `isFormValid` ngay trong luồng render (Zero `useEffect`), đảm bảo 1 lần gõ phím chỉ kích hoạt đúng 1 chu kỳ render.
+    - Gắn kết đầy đủ `<label htmlFor>` với `<input id>`, kiểm tra định dạng tên, email và giới hạn chỉ số IQ (`100 - 250`).
+    - **Atomic Commit**: `feat(ex1.3): implement single-pass derived form validation without useEffect cascades`
 
 ---
 
-## III. BẢNG ĐỐI SOÁT LỊCH SỬ GIT LOG (ATOMIC COMMITS CHECKLIST)
+### 4. Sprint 4: Custom Data Hook & Express Backend Hygiene (Exercise 1.7.1)
 
-| STT | Commit Message Chuẩn Hóa | Phân Vùng File Liên Quan | Trạng Thái |
-| :---: | :--- | :--- | :---: |
-| 1 | `feat(ex1): implement semantic DeveloperCard and SkillBadge` | `DeveloperCard.js` | Hoàn thành |
-| 2 | `style(ex1): add responsive 375px CSS module` | `developer-card.css` | Hoàn thành |
-| 3 | `feat(ex2): normalize smartPeople schema with stable IDs` | `ScientistDirectory.js` | Hoàn thành |
-| 4 | `feat(ex2): add search, IQ filter & toSorted` | `ScientistDirectory.js` | Hoàn thành |
-| 5 | `feat(ex2): add delete/reset & live status` | `ScientistDirectory.js` | Hoàn thành |
-| 6 | `feat(ex3): implement PUBG VN 4-state telemetry & AbortController` | `PubgMatchTelemetry.js` | Hoàn thành |
-| 7 | `feat(ex3): add skeleton UI & retry alert` | `PubgMatchTelemetry.js`, `developer-card.css` | Hoàn thành |
-| 8 | `chore: assemble all exercises into lab3-runner` | `lab3-runner.js`, `index.html` | Hoàn thành |
+- **Mục tiêu**: Đóng gói logic fetch bất đồng bộ an toàn ở frontend và bảo vệ API route ở backend.
+- **Các gói công việc cụ thể**:
+  - [x] **Task 4.1**: Tách custom hook `useForumMessages.js` và giao diện `ForumChannel.js`.
+    - Tích hợp `AbortController` hủy bỏ các request cũ khi người dùng chuyển kênh thảo luận liên tục, loại bỏ hoàn toàn `AbortError` giả mạo và rò rỉ bộ nhớ.
+    - Render danh sách tin nhắn bằng thẻ `<dl>` kết hợp `<Fragment key={msg.id}>`.
+  - [x] **Task 4.2**: Xây dựng Express server (`server.js`).
+    - Cấu hình middleware `cors()` và `express.json()`.
+    - Áp dụng kiểm tra chặt chẽ kiểu dữ liệu và độ dài chuỗi (1 - 300 ký tự) cho route `POST /api/channels/:channelId/messages`, từ chối payload không hợp lệ với mã HTTP `400 Bad Request`.
+    - **Atomic Commit**: `feat(ex1.7): add useForumMessages hook with AbortController and Express CORS/validation`
+
+---
+
+## III. BẢNG ĐỐI SOÁT LỊCH SỬ GIT LOG (LAB 4 ATOMIC COMMITS)
+
+| STT | Commit Message Chuẩn Hóa                                                           | Phân Vùng File Liên Quan                   | Trạng Thái |
+| :-: | :--------------------------------------------------------------------------------- | :----------------------------------------- | :--------: |
+|  1  | `feat(core): add Fragment, lazy and Suspense boundaries to Mini-React`             | `mini-react.js`, `reactive-engine.js`      | Hoàn thành |
+|  2  | `feat(router): implement declarative Routes, NavLink, Outlet and useParams`        | `router.js`                                | Hoàn thành |
+|  3  | `feat(ex1.2): implement Master-Detail PersonDetail with CSS Grid and 404 fallback` | `PersonDetail.js`, `ScientistDirectory.js` | Hoàn thành |
+|  4  | `feat(ex1.3                                                                        |

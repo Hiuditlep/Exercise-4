@@ -184,7 +184,10 @@
   color: #f8fafc;
   border-radius: 12px;
   border: 1px solid #1e293b;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 .telemetry-header h3 {
@@ -235,8 +238,12 @@
 }
 
 @keyframes pulseBlueZone {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .telemetry-idle {
@@ -309,4 +316,161 @@
 .squad-status {
   color: #4ade80;
   font-weight: 500;
+}
+
+/* === LAB 4 STYLES === */
+.top-navbar {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 1rem;
+  background-color: #0f172a;
+  border-bottom: 1px solid #334155;
+}
+
+.nav-link {
+  color: #94a3b8;
+  text-decoration: none;
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.nav-link.active {
+  background-color: #0284c7;
+  color: #ffffff;
+}
+
+/* Exercise 1.2.2: Responsive CSS Grid Layout */
+.person-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) 2fr;
+  gap: 1.5rem;
+  max-width: 760px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #334155;
+}
+
+/* Exercise 1.1: Zero CLS Skeleton trùng khớp kích thước */
+.person-detail-skeleton {
+  max-width: 760px;
+  height: 210px;
+  margin: 2rem auto;
+  background-color: #1e293b;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8;
+  animation: pulse 1.2s infinite ease-in-out;
+}
+
+.person-details {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.person-details dt {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.person-details dd {
+  margin: 0;
+}
+
+.pioneer-link {
+  color: #38bdf8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.pioneer-link:hover {
+  text-decoration: underline;
+}
+
+.not-found-box,
+.form-container,
+.forum-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-radius: 12px;
+}
+
+.reg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.reg-form input,
+.msg-form input {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #0f172a;
+  color: #fff;
+}
+
+.field-error {
+  color: #f87171;
+  font-size: 0.85rem;
+}
+
+.btn-submit,
+.btn-back {
+  padding: 0.5rem 1rem;
+  background-color: #0284c7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.btn-submit:disabled {
+  background-color: #475569;
+  cursor: not-allowed;
+}
+
+.channel-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.channel-tabs button {
+  padding: 0.4rem 0.8rem;
+  background-color: #0f172a;
+  color: #cbd5e1;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.channel-tabs button.active-tab {
+  background-color: #0284c7;
+  color: #fff;
+}
+
+.message-list dt {
+  font-weight: bold;
+  color: #38bdf8;
+  margin-top: 0.75rem;
+}
+
+.message-list dd {
+  margin-left: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #334155;
 }
