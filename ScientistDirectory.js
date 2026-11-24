@@ -1,6 +1,7 @@
 // ScientistDirectory.js
 import { createElement } from "./mini-react.js";
 import { useState } from "./reactive-engine.js";
+import { navigate } from "./router.js";
 
 export const SMART_PEOPLE = [
   { id: "sp-1", name: "Johann Goethe", age: 82, iq: 210 },
@@ -115,7 +116,18 @@ export function ScientistDirectory(props = {}) {
     createElement(
       "li",
       { key: p.id, className: "pioneer-item" },
-      createElement("span", null, `${p.name} — Age: ${p.age} | IQ: ${p.iq}`),
+      createElement(
+        "a",
+        {
+          href: `#/scientists/${p.id}`,
+          className: "pioneer-link",
+          onClick: (e) => {
+            e.preventDefault();
+            navigate(`/scientists/${p.id}`);
+          },
+        },
+        `${p.name} — Age: ${p.age} | IQ: ${p.iq}`,
+      ),
       createElement(
         "button",
         {
