@@ -34,10 +34,10 @@ function NotFoundState({ id }) {
   );
 }
 
-export function PersonDetail({ people = SMART_PEOPLE }) {
+export function PersonDetail(props = {}) {
+  const people = props.people || SMART_PEOPLE;
   const { id } = useParams();
-  const person = people.find((p) => p.id === id);
-
+  // ... phần dưới giữ nguyên
   if (!person) {
     return NotFoundState({ id });
   }

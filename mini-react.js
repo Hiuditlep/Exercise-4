@@ -96,7 +96,8 @@ export function renderToDOM(vnode) {
   const dom = document.createElement(vnode.type);
 
   const isProperty = (key) => key !== "children";
-  Object.keys(vnode.props)
+  // Sửa dòng 99 trong mini-react.js thành:
+  Object.keys(vnode.props || {})
     .filter(isProperty)
     .forEach((name) => {
       if (name.startsWith("on")) {
